@@ -1,0 +1,41 @@
+name: Global GitHub Push Reminder
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # Runs every day at 6 PM GMT+7
+
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get all repositories
+        id: get_repos
+        run: |
+          REPOS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/user/repos?per_page=100" | jq -r '.[].name')
+          echo "REPOS=$REPOS" >> $GITHUB_ENV
+
+      - name: Check latest commit across all repositories
+        run: |
+          TODAY=$(date -u +"%Y-%m-%d")
+          PUSHED_TODAY=false
+
+          for REPO in $REPOS; do
+            LATEST_COMMIT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository_owner }}/$REPO/commits" | jq -r '.[0].commit.committer.date' | cut -d'T' -f1)
+            
+            if [[ "$LATEST_COMMIT" == "$TODAY" ]]; then
+              PUSHED_TODAY=true
+              break
+            fi
+          done
+
+          if [ "$PUSHED_TODAY" == "false" ]; then
+            echo "❌ No push today! Creating an issue reminder."
+            curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues \
+              -d '{"title": "🚨 Reminder: No Push Today!", "body": "Hey! You haven’t pushed anything today across all repos. Don’t break your streak! 🚀"}'
+          else
+            echo "✅ Already pushed today!"
+          fi
