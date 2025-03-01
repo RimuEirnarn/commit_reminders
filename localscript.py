@@ -13,6 +13,7 @@ APP = os.getenv("APP_TITLE")
 
 def get_repos():
     """Fetch all repositories for the user."""
+    print("Fetching all github repositories")
     url = f"https://api.github.com/users/{USERNAME}/repos"
     headers = {"Authorization": f"token {TOKEN}"}
     response = requests.get(url, headers=headers, timeout=10)
@@ -25,6 +26,7 @@ def get_repos():
 
 def check_last_commit(repo):
     """Check the latest commit date for a given repository."""
+    print("Checking when was the last time a commit occurred")
     url = f"https://api.github.com/repos/{USERNAME}/{repo}/commits"
     headers = {"Authorization": f"token {TOKEN}"}
     response = requests.get(url, headers=headers, timeout=10)
@@ -53,6 +55,7 @@ def check_global_commits():
         msg = "❌ No GitHub push today! Commit something now."
 
     push_toast(APP, msg)
+    print(msg)
 
 
 if __name__ == "__main__":
