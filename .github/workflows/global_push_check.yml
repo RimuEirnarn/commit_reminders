@@ -14,14 +14,14 @@ jobs:
         run: |
           REPOS=$(curl -s -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/user/repos?per_page=100" | jq -r '.[].name')
-          echo "REPOS=$REPOS" >> $GITHUB_ENV
+          echo "REPOS=${REPOS}" >> "$GITHUB_OUTPUT"
 
       - name: Check latest commit across all repositories
         run: |
           TODAY=$(date -u +"%Y-%m-%d")
           PUSHED_TODAY=false
 
-          for REPO in $REPOS; do
+          for REPO in ${{ steps.get_repos.outputs.REPOS }}; do
             LATEST_COMMIT=$(curl -s -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
               "https://api.github.com/repos/${{ github.repository_owner }}/$REPO/commits" | jq -r '.[0].commit.committer.date' | cut -d'T' -f1)
             
