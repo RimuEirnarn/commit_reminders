@@ -26,7 +26,7 @@ def get_repos():
 
 def check_last_commit(repo):
     """Check the latest commit date for a given repository."""
-    print("Checking when was the last time a commit occurred")
+    print(f"Checking when was the last time a commit occurred for {repo}")
     url = f"https://api.github.com/repos/{USERNAME}/{repo}/commits"
     headers = {"Authorization": f"token {TOKEN}"}
     response = requests.get(url, headers=headers, timeout=10)
