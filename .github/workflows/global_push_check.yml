@@ -1,8 +1,8 @@
 name: Global GitHub Push Reminder
 
 on:
-  schedule:
-    - cron: "0 12 * * *" # Runs every day at 6 PM GMT+7
+  # schedule:
+  #   - cron: "0 12 * * *" # Runs every day at 6 PM GMT+7
   workflow_dispatch:
 
 jobs:
